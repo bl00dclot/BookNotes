@@ -1,33 +1,31 @@
 <%- include("partials/header.ejs") %>
-
+                                                    <!-- Sort data form -->
 <div class="sort__box">
     <div class="sort__options">
         <form action="/sort" method="post">
             <label for="sortTitle">Title:</label>
             <select name="sortTitle" id="">
-                <option value="Ascending">Ascending</option>
-                <option value="Descending">Descending</option>
-            </select>
-            <label for="sortReviewSize">Review Size</label>
-            <select name="sortReviewSize" id="">
-                <option value="Largest">Largest</option>
-                <option value="Smallest">Smallest</option>
+                <option value=""></option>
+                <option value="ASC">Ascending</option>
+                <option value="DESC">Descending</option>
             </select>
             <label for="sortRating">Rating</label>
             <select name="sortRating" id="">
-                <option value="Highest">Highest</option>
-                <option value="Lowest">Lowest</option>
+                <option value=""></option>
+                <option value="DESC">Highest</option>
+                <option value="ASC">Lowest</option>
             </select>
             <label for="sortDate">By date:</label>
             <select name="sortDate" id="">
-                <option value="Oldest">Oldest</option>
-                <option value="Recent">Recent</option>
+                <option value=""></option>
+                <option value="ASC">Oldest</option>
+                <option value="DESC">Recent</option>
             </select>
             <button type="submit" name="sortBooks">Sort</button>    
         </form>
         </div>
 </div>
-
+                                                <!-- Cycle database in elements -->
     <div class="book__box">
         <% for (let book of allBooks) { %>
             <h2 class="review__title"><%= book.title %></h2>
