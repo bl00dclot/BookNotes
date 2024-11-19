@@ -1,20 +1,39 @@
 <%- include("partials/header.ejs") %>
 
-    <% if (locals.bookReview) { %>
-        <form action="/editpost" method="post">
-        <input type="text" name="updateTitle" value="<%= bookTitle %>">
-        <input type="text" name="updateBookReview" value="<%= bookReview %>">
-        <input type="text" name="updateRating" value="<%= bookRating %>">
-        <input type="submit" value="Submit">
-        </form>
+    <%     if (locals.bookCovers) { %>
+        <h2>Choose a book cover</h2>
+        <% bookCovers.forEach((book) => { %>
+            <form action="/bookcovers" method="post">
+                <input type="hidden" name="authorID" value="<%= book.author_key %>">
+                <input type="hidden" name="bookImgID" value="<%= book.book_cover %>">
+                <input type="hidden" name="author" value="<%= book.author_name %>">
+                <input type="hidden" name="title" value="<%= book.title %>">
+                <h3><%= book.title %></h3>
+                <div>by <%= book.author_name %></div>
+                    <img src="<%= book.author_key %>" alt="author_img">
+                <button class="bookTitle" type="submit">
+                    <img src="<%= book.book_cover %>" alt="book_cover">
+                </button>
+            </form>
+            <div class="bookTitle" name="bookTitle" value="<%= book.id %>"></div>
+       <% }); %>
     <% } else { %>
-        <form action="/post" method="post">
-        <input type="text" name="newTitle">
-        <input type="text" name="newBookReview">
-        <input type="text" name="newRating">
-        <input type="submit" value="Submit">
-        </form>
+        <% if (locals.bookReview) { %>
+            <form action="/editpost" method="post">
+            <input type="text" name="updateTitle" value="<%= bookTitle %>">
+            <input type="text" name="updateBookReview" value="<%= bookReview %>">
+            <input type="text" name="updateRating" value="<%= bookRating %>">
+            <input type="submit" value="Submit">
+            </form>
+        <% } else { %>
+            <form action="/post" method="post">
+            <input type="text" name="newTitle">
+            <input type="text" name="newBookReview">
+            <input type="text" name="newRating">
+            <input type="submit" value="Submit">
+            </form>
+        <% } %>
+    
     <% } %>
-
 
 <%- include("partials/footer.ejs") %>

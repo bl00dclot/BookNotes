@@ -25,10 +25,14 @@
         </form>
         </div>
 </div>
-                                                <!-- Cycle database in elements -->
+                                                <!-- Cycle database into elements -->
     <div class="book__box">
         <% for (let book of allBooks) { %>
-            <h2 class="review__title"><%= book.title %></h2>
+            <h3><%= book.book_title %></h3>
+            <div>by <%= book.author_name %></div>
+            <img src="<%= book.book_cover %>" alt="book_cover">
+
+            <h2 class="review__title"><%= book.review_title %></h2>
             <h6 class="review__date"><%= book.date %></h6>
             <p class="review__paragraph"><%= book.review %></p>
             <div class="review__rating"><%= book.rating %>/10</div>

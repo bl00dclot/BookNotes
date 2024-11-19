@@ -31,7 +31,9 @@ let books = [];
 
 app.get("/", async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM books ORDER BY date DESC");
+        const result = await db.query(
+            "SELECT * FROM books JOIN book_covers ON books.id = book_covers.id ORDER BY date DESC"
+        );
         books = result.rows;
         res.render("index.ejs", {allBooks: books});
     } catch (err) {
@@ -114,7 +116,7 @@ app.post("/editpost", async (req, res) => {
         const bookRating = req.body.updateRating;
         const currentDate = new Date();
         await db.query (
-            "UPDATE books SET title = $1, review = $2, rating = $3, date = $4 WHERE id = $5",
+            "UPDATE books SET review_title = $1, review = $2, rating = $3, date = $4 WHERE id = $5",
             [bookTitle, bookReview, bookRating, currentDate, updateBookID]);
         res.redirect("/");
     
@@ -125,18 +127,64 @@ app.post("/editpost", async (req, res) => {
 
                 /// Post route to create a new book review
 
+                let currentBookID
+
+
 app.post("/post", async (req, res) => {
     try {
         const newTitle = req.body.newTitle;
         const newBookReview = req.body.newBookReview;
         const newRating = req.body.newRating;
         const currentDate = new Date();
-        await db.query("INSERT INTO books (title, review, rating, date) VALUES ($1, $2, $3, $4)", [newTitle, newBookReview, newRating, currentDate]);
-        res.redirect("/");    
+        const result = await db.query(
+        "INSERT INTO books (review_title, review, rating, date) VALUES ($1, $2, $3, $4) RETURNING *",
+         [newTitle, newBookReview, newRating, currentDate]);
+        currentBookID = result.rows[0].id;
+        console.log(currentBookID);
+        
+        const editedTitle = newTitle.replace(/\s/g, '%20');
+        
+        // Get Book_covers from API
+
+        const response = await axios.get(`https://openlibrary.org/search.json?title=${editedTitle}`);
+        
+        const allBookCovers = response.data;
+
+        // Empty array for filtered and mapped Book_covers
+
+        let bookCovers = [];
+
+        for (let book of allBookCovers['docs']) {
+            const foundBook = {
+                "title": book['title'],
+                "author_name": book['author_name'],
+                "author_key": `https://covers.openlibrary.org/a/olid/${book['author_key']}-S.jpg`, 
+                "book_cover": `https://covers.openlibrary.org/b/olid/${book['cover_edition_key']}-M.jpg`,
+            };
+            if (foundBook['book_cover'] === undefined) {
+                continue;
+            } 
+            bookCovers.push(foundBook);
+        };
+        bookCovers.forEach((book, index) => {
+            book.id = index + 1;
+        });
+        res.render("bookreview.ejs", {bookCovers: bookCovers});    
     } catch (err) {
-        console.error(err.message)
+        console.error(err.message);
     }
+    app.post("/bookcovers", async (req, res) => {
+        const result2 = await db.query(
+            "INSERT INTO book_covers (id, author_name, book_title, author_cover, book_cover) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [currentBookID, req.body.author, req.body.title,req.body.authorID, req.body.bookImgID]
+    );
+    let currentBook_CoverID = result2.rows[0].id;
+    console.log(currentBook_CoverID);
+    res.redirect("/");
 });
+});
+
+
 
 app.listen(port, () => {
     console.log(`Server on: ${port}`)
